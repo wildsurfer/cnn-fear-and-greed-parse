@@ -1,4 +1,4 @@
-module cnn-fear-and-greed-parse
+module github.com/wildsurfer/cnn-fear-and-greed-parse
 
 go 1.16
 
