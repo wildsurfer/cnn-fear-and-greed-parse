@@ -67,6 +67,7 @@ func _getGoqueryDocument() (*goquery.Document, error) {
 		return &emptyDoc, fmt.Errorf("goquery error: %v", err)
 	}
 
+	defer res.Body.Close()
 	return doc, nil
 }
 
@@ -78,7 +79,6 @@ func _fetch() (*http.Response, error) {
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf("http status code error: %d %s", res.StatusCode, res.Status)
 	}
-	defer res.Body.Close()
 	return res, nil
 }
 
