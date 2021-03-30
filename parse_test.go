@@ -114,23 +114,23 @@ func TestParse(t *testing.T) {
 
 	want := Result{
 		ImageUrl: "http://markets.money.cnn.com/Marketsdata/uploadhandler/z6f8f7d0az4c46c1b6d9644447a6d8829abaa17ece.png",
-		Now: ResultNow{
+		Now: ResultValueText{
 			Value: 44,
 			Text:  "Fear",
 		},
-		PreviousClose: ResultPreviousClose{
+		PreviousClose: ResultValueText{
 			Value: 52,
 			Text:  "Neutral",
 		},
-		OneWeekAgo: ResultOneWeekAgo{
+		OneWeekAgo: ResultValueText{
 			Value: 54,
 			Text:  "Neutral",
 		},
-		OneMonthAgo: ResultOneMonthAgo{
+		OneMonthAgo: ResultValueText{
 			Value: 48,
 			Text:  "Neutral",
 		},
-		OneYearAgo: ResultOneYearAgo{
+		OneYearAgo: ResultValueText{
 			Value: 23,
 			Text:  "Extreme Fear",
 		},
@@ -165,7 +165,6 @@ func getGoqueryDocumentMock() *goquery.Document {
 
 //Uncomment below to update `test/page.html` file.
 //Don't forget to update asserts in TestParse test.
-//
 //func UpdateTestAssets() {
 //	res, err := http.Get(_url)
 //	if err != nil {

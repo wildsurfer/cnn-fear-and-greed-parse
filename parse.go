@@ -15,39 +15,19 @@ const _url = "https://money.cnn.com/data/fear-and-greed/"
 // "All times are ET" as said on money.cnn.com website in footer
 var _location *time.Location
 
-type ResultNow struct {
-	Value int    `json:"value"`
-	Text  string `json:"text"`
-}
-
-type ResultPreviousClose struct {
-	Value int    `json:"value"`
-	Text  string `json:"text"`
-}
-
-type ResultOneWeekAgo struct {
-	Value int    `json:"value"`
-	Text  string `json:"text"`
-}
-
-type ResultOneMonthAgo struct {
-	Value int    `json:"value"`
-	Text  string `json:"text"`
-}
-
-type ResultOneYearAgo struct {
+type ResultValueText struct {
 	Value int    `json:"value"`
 	Text  string `json:"text"`
 }
 
 type Result struct {
-	ImageUrl       string              `json:"image_url"`
-	Now            ResultNow           `json:"now"`
-	PreviousClose  ResultPreviousClose `json:"previous_close"`
-	OneWeekAgo     ResultOneWeekAgo    `json:"one_week_ago"`
-	OneMonthAgo    ResultOneMonthAgo   `json:"one_month_ago"`
-	OneYearAgo     ResultOneYearAgo    `json:"one_year_ago"`
-	LastUpdateDate time.Time           `json:"last_update_date"`
+	ImageUrl       string          `json:"imageUrl"`
+	Now            ResultValueText `json:"now"`
+	PreviousClose  ResultValueText `json:"previousClose"`
+	OneWeekAgo     ResultValueText `json:"oneWeekAgo"`
+	OneMonthAgo    ResultValueText `json:"oneMonthAgo"`
+	OneYearAgo     ResultValueText `json:"oneYearAgo"`
+	LastUpdateDate time.Time       `json:"lastUpdateDate"`
 }
 
 func init() {
