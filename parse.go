@@ -162,6 +162,18 @@ func _parse(doc *goquery.Document) (Result, error) {
 	return result, nil
 }
 
+// Parse is the only method you need to get data from CNN's Fear & Greed page.
+//
+// Usage example:
+// func main() {
+//   result, err := Parse()
+//
+//   if err != nil {
+//     panic(err)
+//   } else {
+//     fmt.Print(result)
+//   }
+// }
 func Parse() (Result, error) {
 	doc, err := _getGoqueryDocument()
 	if err != nil {
