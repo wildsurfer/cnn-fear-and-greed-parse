@@ -1,4 +1,5 @@
-# cnn-fear-and-greed-parse [![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse)
+# cnn-fear-and-greed-parse [![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse) ![example workflow](https://github.com/wildsurfer/cnn-fear-and-greed-parse/actions/workflows/go.yml/badge.svg)
+
 Golang package to fetch and parse data from https://money.cnn.com/data/fear-and-greed/
 
 ## Usage example:
