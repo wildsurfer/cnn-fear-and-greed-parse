@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -34,6 +35,25 @@ func init() {
 	_location, _ = time.LoadLocation("EST")
 }
 
+// Use it to get image bytes
+func (r *Result) GetImageBytes() ([]byte, error) {
+	response, err := http.Get(r.ImageUrl)
+
+	if err != nil {
+		return nil, errors.New("image download failed")
+	} else if response.StatusCode != 200 {
+		return nil, errors.New("image download failed, non 200 response code")
+	}
+
+	bytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, errors.New("reading image bytes failed")
+	}
+
+	err = response.Body.Close()
+	return bytes, err
+}
+
 func _getGoqueryDocument() (*goquery.Document, error) {
 	emptyDoc := goquery.Document{}
 
@@ -47,8 +67,8 @@ func _getGoqueryDocument() (*goquery.Document, error) {
 		return &emptyDoc, fmt.Errorf("goquery error: %v", err)
 	}
 
-	defer res.Body.Close()
-	return doc, nil
+	err = res.Body.Close()
+	return doc, err
 }
 
 func _fetch() (*http.Response, error) {
