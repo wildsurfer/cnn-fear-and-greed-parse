@@ -32,7 +32,7 @@ type Result struct {
 }
 
 func init() {
-	_location, _ = time.LoadLocation("EST")
+	_location, _ = time.LoadLocation("America/New_York")
 }
 
 // Use it to get image bytes
@@ -94,8 +94,10 @@ func _parseText(text string) (int, string) {
 	return int(v), sm[2]
 }
 
-func _parseDate(text string, today time.Time) time.Time {
+func _parseDate(text string) time.Time {
 	t, _ := time.Parse("Last updated Jan 2 at 3:04pm", text)
+
+	today := time.Now().In(_location)
 
 	// As far as year isn't specified on money.cnn.com website we assume it to be the current one.
 	t1 := time.Date(today.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), 0, 0, _location)
@@ -135,7 +137,7 @@ func _parse(doc *goquery.Document) (Result, error) {
 		})
 
 		text := s.Find("#needleAsOfDate").Text()
-		result.LastUpdateDate = _parseDate(text, time.Now().In(_location))
+		result.LastUpdateDate = _parseDate(text)
 	})
 
 	fieldIsEmpty := false

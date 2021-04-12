@@ -2,6 +2,7 @@ package cnn_fear_and_greed_parse
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	"github.com/tkuchiki/faketime"
 	"log"
 	"os"
 	"testing"
@@ -70,24 +71,17 @@ func TestParseText(t *testing.T) {
 	)
 }
 
-func TestParseDate(t *testing.T) {
-	text := "Last updated Mar 29 at 4:59pm"
-	today := time.Now().In(_location)
-	want := time.Date(today.Year(), time.Month(3), 29, 16, 59, 0, 0, _location)
-	got := _parseDate(text, today)
-
-	if got != want {
-		t.Errorf("Date parse failed.\n\tWant: '%s',\n\t Got: '%s'", want, got)
-	}
-}
-
 // Covers the situation when today is the beginning of the year
 // and last update was done at the end of previous year.
 func TestParseDateEdgeCase(t *testing.T) {
 	text := "Last updated Dec 31 at 4:59pm"
-	today := time.Date(2021, time.Month(1), 01, 3, 28, 0, 0, _location)
+
+	f := faketime.NewFaketime(2021, time.Month(1), 01, 3, 28, 0, 0, _location)
+	defer f.Undo()
+	f.Do()
+
 	want := time.Date(2020, time.Month(12), 31, 16, 59, 0, 0, _location)
-	got := _parseDate(text, today)
+	got := _parseDate(text)
 
 	if got != want {
 		t.Errorf("Date parse failed.\n\tWant: '%s',\n\t Got: '%s'", want, got)
@@ -97,9 +91,13 @@ func TestParseDateEdgeCase(t *testing.T) {
 // Covers the situation when now and last updated time are exactly the same
 func TestParseDateEdgeCase1(t *testing.T) {
 	text := "Last updated Dec 31 at 11:59pm"
-	today := time.Date(2020, time.Month(12), 31, 23, 59, 0, 0, _location)
+
+	f := faketime.NewFaketime(2020, time.Month(12), 31, 23, 59, 0, 0, _location)
+	defer f.Undo()
+	f.Do()
+
 	want := time.Date(2020, time.Month(12), 31, 23, 59, 0, 0, _location)
-	got := _parseDate(text, today)
+	got := _parseDate(text)
 
 	if got != want {
 		t.Errorf("Date parse failed.\n\tWant: '%s',\n\t Got: '%s'", want, got)
@@ -107,10 +105,14 @@ func TestParseDateEdgeCase1(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
+
+	f := faketime.NewFaketime(2021, time.March, 29, 17, 60, 0, 0, _location)
+	defer f.Undo()
+	f.Do()
+
 	doc := getGoqueryDocumentMock()
 	result, _ := _parse(doc)
-	today := time.Now().In(_location)
-	wantLastUpdateDate := time.Date(today.Year(), time.Month(3), 29, 16, 59, 0, 0, _location)
+	wantLastUpdateDate := time.Date(2021, time.Month(3), 29, 16, 59, 0, 0, _location)
 
 	want := Result{
 		ImageUrl: "http://markets.money.cnn.com/Marketsdata/uploadhandler/z6f8f7d0az4c46c1b6d9644447a6d8829abaa17ece.png",
