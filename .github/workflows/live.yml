@@ -1,0 +1,20 @@
+name: Live check
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Live test against CNN
+        run: CNNFAG_LIVE=1 go test -v -count=1 -run TestGetLive ./...
