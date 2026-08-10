@@ -1,13 +1,12 @@
-name: Go
+name: Live check
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
 
 jobs:
-  build:
+  live:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,8 +17,5 @@ jobs:
           go-version: stable
           cache: false
 
-      - name: Vet
-        run: go vet ./...
-
-      - name: Test
-        run: go test -v ./...
+      - name: Live test against CNN
+        run: CNNFAG_LIVE=1 go test -v -count=1 -run TestGetLive ./...
