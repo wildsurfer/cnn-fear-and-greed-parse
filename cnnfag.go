@@ -22,21 +22,29 @@ var ErrUnexpectedStatus = errors.New("unexpected http status")
 
 // Point is one daily observation of the index.
 type Point struct {
+	// Date is the start of the trading day in UTC. The newest point carries
+	// the exact time of CNN's latest update instead.
 	Date   time.Time `json:"date"`
 	Score  float64   `json:"score"`
 	Rating string    `json:"rating"`
 }
 
 // Result holds the current state of the index and about a year of daily history.
+//
+// Scores use CNN's 0–100 scale, where 0 is extreme fear and 100 is extreme
+// greed. Ratings are CNN's text labels for score bands: "extreme fear",
+// "fear", "neutral", "greed", "extreme greed".
 type Result struct {
-	Score         float64   `json:"score"`
-	Rating        string    `json:"rating"`
+	Score  float64 `json:"score"`
+	Rating string  `json:"rating"`
+	// Timestamp is when CNN last updated the score.
 	Timestamp     time.Time `json:"timestamp"`
 	PreviousClose float64   `json:"previousClose"`
 	OneWeekAgo    float64   `json:"oneWeekAgo"`
 	OneMonthAgo   float64   `json:"oneMonthAgo"`
 	OneYearAgo    float64   `json:"oneYearAgo"`
-	History       []Point   `json:"history"`
+	// History holds daily scores for roughly the past year, oldest first.
+	History []Point `json:"history"`
 }
 
 type apiResponse struct {
