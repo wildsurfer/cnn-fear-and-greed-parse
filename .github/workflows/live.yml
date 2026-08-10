@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+          cache: false
 
       - name: Live test against CNN
         run: CNNFAG_LIVE=1 go test -v -count=1 -run TestGetLive ./...
