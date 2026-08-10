@@ -91,6 +91,22 @@ func TestGetUnexpectedStatus(t *testing.T) {
 	}
 }
 
+func TestGetEmptyResult(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("{}"))
+	}))
+	defer srv.Close()
+
+	old := endpoint
+	endpoint = srv.URL
+	defer func() { endpoint = old }()
+
+	_, err := Get(context.Background())
+	if !errors.Is(err, ErrEmptyResult) {
+		t.Fatalf("err = %v, want ErrEmptyResult", err)
+	}
+}
+
 func TestGetLive(t *testing.T) {
 	if os.Getenv("CNNFAG_LIVE") != "1" {
 		t.Skip("set CNNFAG_LIVE=1 to run the live test")

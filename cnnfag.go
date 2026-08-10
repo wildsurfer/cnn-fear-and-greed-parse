@@ -20,6 +20,10 @@ var endpoint = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
 // CNN answers 418 when a request is missing browser-like headers.
 var ErrUnexpectedStatus = errors.New("unexpected http status")
 
+// ErrEmptyResult is returned when CNN answers 200 but the payload carries no
+// index data, which most likely means the API schema changed.
+var ErrEmptyResult = errors.New("empty result, CNN may have changed the API schema")
+
 // Point is one daily observation of the index.
 type Point struct {
 	// Date is the start of the trading day in UTC. The newest point carries
@@ -93,6 +97,10 @@ func Get(ctx context.Context) (Result, error) {
 	}
 
 	fg := raw.FearAndGreed
+	if fg.Rating == "" || fg.Timestamp.IsZero() {
+		return Result{}, ErrEmptyResult
+	}
+
 	result := Result{
 		Score:         fg.Score,
 		Rating:        fg.Rating,
