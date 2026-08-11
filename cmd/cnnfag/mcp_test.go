@@ -28,12 +28,16 @@ func TestServeMCP(t *testing.T) {
 	}
 
 	in := strings.Join([]string{
+		`not json at all`,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1999-01-01"}}`,
 		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","clientInfo":{"name":"test","version":"0"}}}`,
 		`{"jsonrpc":"2.0","method":"notifications/initialized"}`,
 		`{"jsonrpc":"2.0","id":2,"method":"tools/list"}`,
 		`{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_fear_and_greed","arguments":{}}}`,
 		`{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_fear_and_greed","arguments":{"include_history":true}}}`,
 		`{"jsonrpc":"2.0","id":5,"method":"no/such/method"}`,
+		`{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"wrong_tool"}}`,
+		`{"jsonrpc":"2.0","id":7,"method":"ping"}`,
 	}, "\n") + "\n"
 
 	var out strings.Builder
@@ -42,8 +46,8 @@ func TestServeMCP(t *testing.T) {
 	}
 
 	lines := strings.Split(strings.TrimSpace(out.String()), "\n")
-	if len(lines) != 5 {
-		t.Fatalf("got %d responses, want 5 (the notification must not be answered):\n%s", len(lines), out.String())
+	if len(lines) != 9 {
+		t.Fatalf("got %d responses, want 9 (the notification must not be answered):\n%s", len(lines), out.String())
 	}
 
 	var resp struct {
@@ -54,14 +58,26 @@ func TestServeMCP(t *testing.T) {
 		} `json:"error"`
 	}
 
-	// initialize echoes a supported protocol version.
+	// A line that is not JSON gets a parse error.
 	mustUnmarshal(t, lines[0], &resp)
+	if resp.Error == nil || resp.Error.Code != -32700 {
+		t.Errorf("parse error response: %s", lines[0])
+	}
+
+	// An unsupported protocol version falls back to the latest we know.
+	mustUnmarshal(t, lines[1], &resp)
+	if !strings.Contains(string(resp.Result), `"protocolVersion":"2025-06-18"`) {
+		t.Errorf("initialize fallback response: %s", lines[1])
+	}
+
+	// initialize echoes a supported protocol version.
+	mustUnmarshal(t, lines[2], &resp)
 	if !strings.Contains(string(resp.Result), `"protocolVersion":"2025-03-26"`) {
-		t.Errorf("initialize response: %s", lines[0])
+		t.Errorf("initialize response: %s", lines[2])
 	}
 
 	// tools/list advertises exactly our tool.
-	mustUnmarshal(t, lines[1], &resp)
+	mustUnmarshal(t, lines[3], &resp)
 	var list struct {
 		Tools []struct {
 			Name string `json:"name"`
@@ -74,25 +90,37 @@ func TestServeMCP(t *testing.T) {
 
 	// tools/call returns the score and the indicators, and omits every
 	// history by default.
-	mustUnmarshal(t, lines[2], &resp)
+	mustUnmarshal(t, lines[4], &resp)
 	if !strings.Contains(string(resp.Result), "43.71") ||
 		!strings.Contains(string(resp.Result), "marketVolatility") ||
 		strings.Contains(string(resp.Result), "history") ||
 		strings.Contains(string(resp.Result), "17.5") {
-		t.Errorf("tools/call without history: %s", lines[2])
+		t.Errorf("tools/call without history: %s", lines[4])
 	}
 
 	// include_history brings the daily points in, for the index and the
 	// indicators both.
-	mustUnmarshal(t, lines[3], &resp)
+	mustUnmarshal(t, lines[5], &resp)
 	if !strings.Contains(string(resp.Result), "60.2") || !strings.Contains(string(resp.Result), "17.5") {
-		t.Errorf("tools/call with history: %s", lines[3])
+		t.Errorf("tools/call with history: %s", lines[5])
 	}
 
 	// Unknown methods get a JSON-RPC error.
-	mustUnmarshal(t, lines[4], &resp)
+	mustUnmarshal(t, lines[6], &resp)
 	if resp.Error == nil || resp.Error.Code != -32601 {
-		t.Errorf("unknown method response: %s", lines[4])
+		t.Errorf("unknown method response: %s", lines[6])
+	}
+
+	// Calling a tool we do not have is an invalid-params error.
+	mustUnmarshal(t, lines[7], &resp)
+	if resp.Error == nil || resp.Error.Code != -32602 {
+		t.Errorf("unknown tool response: %s", lines[7])
+	}
+
+	// ping answers with an empty result.
+	mustUnmarshal(t, lines[8], &resp)
+	if string(resp.Result) != "{}" {
+		t.Errorf("ping response: %s", lines[8])
 	}
 }
 

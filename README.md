@@ -1,6 +1,6 @@
 # cnn-fear-and-greed-parse
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse/v2.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse/v2) ![CI](https://github.com/wildsurfer/cnn-fear-and-greed-parse/actions/workflows/go.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse/v2.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse/v2) ![CI](https://github.com/wildsurfer/cnn-fear-and-greed-parse/actions/workflows/go.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/wildsurfer/cnn-fear-and-greed-parse/badge.svg?branch=main)](https://coveralls.io/github/wildsurfer/cnn-fear-and-greed-parse?branch=main) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Go package for CNN's [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed), a 0–100 gauge of US stock market sentiment. It returns the current score and rating, the values for the previous close, week, month and year, about a year of daily history, and the seven component indicators (market momentum, stock price strength, stock price breadth, put/call options, market volatility, junk bond demand, safe haven demand), each with its own score, rating and history of raw values. The module also ships a CLI and an MCP server, and has no dependencies outside the Go standard library.
 
