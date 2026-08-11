@@ -48,7 +48,7 @@ type Result struct {
 	OneMonthAgo   float64   `json:"oneMonthAgo"`
 	OneYearAgo    float64   `json:"oneYearAgo"`
 	// History holds daily scores for roughly the past year, oldest first.
-	History []Point `json:"history"`
+	History []Point `json:"history,omitempty"`
 }
 
 type apiResponse struct {

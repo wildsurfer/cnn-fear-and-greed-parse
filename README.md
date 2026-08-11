@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse/v2.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse/v2) ![CI](https://github.com/wildsurfer/cnn-fear-and-greed-parse/actions/workflows/go.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Go package for CNN's [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed), a 0–100 gauge of US stock market sentiment. It returns the current score and rating, the values for the previous close, week, month and year, and about a year of daily history. The package has no dependencies outside the Go standard library.
+Go package for CNN's [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed), a 0–100 gauge of US stock market sentiment. It returns the current score and rating, the values for the previous close, week, month and year, and about a year of daily history. The module also ships a CLI and an MCP server, and has no dependencies outside the Go standard library.
 
 ## Install
 
@@ -42,6 +42,42 @@ Now: 64 (greed)
 One year ago: 58
 History: 250 daily points since 2025-08-11
 ```
+
+## CLI
+
+For cron jobs and shell pipelines, without writing Go:
+
+```
+go install github.com/wildsurfer/cnn-fear-and-greed-parse/v2/cmd/cnnfag@latest
+```
+
+```
+$ cnnfag
+64 (greed) as of 2026-08-11T00:00:00Z
+previous close 64 · week ago 60 · month ago 47 · year ago 58
+
+$ cnnfag -json | jq .score
+64.3714285714286
+```
+
+`-json` prints the full result, including the daily history. `-timeout` changes the request timeout (default 15s).
+
+## MCP server
+
+`cnnfag mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over stdio, so AI assistants can query the index. It exposes one tool, `get_fear_and_greed`, with an optional `include_history` argument. Configuration for MCP clients:
+
+```json
+{
+  "mcpServers": {
+    "cnnfag": {
+      "command": "cnnfag",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+The client must be able to find the binary: use the full path (usually `~/go/bin/cnnfag`) if your MCP client does not inherit your shell's `PATH`. Like the rest of the module, the server is built on the standard library only.
 
 ## How it works
 
@@ -83,6 +119,10 @@ Scores changed from rounded integers to the exact floats CNN serves, so `44` in 
 ## Project history
 
 v1 (2021) parsed the HTML of `money.cnn.com/data/fear-and-greed` with goquery and could also download the index needle image. CNN removed that page, which broke parsing, and the image no longer exists. v2 (2026) is a rewrite on the JSON endpoint with a smaller API, historical data and zero dependencies. The last v1 release is tagged [`v1.2.0`](https://github.com/wildsurfer/cnn-fear-and-greed-parse/tree/v1.2.0).
+
+## Data disclaimer
+
+This package is not affiliated with or endorsed by CNN. The Fear & Greed Index and its values belong to CNN (Warner Bros. Discovery). The MIT license covers only the code in this repository and gives you no rights to CNN's data. CNN's Terms of Use permit personal use of site content and restrict commercial exploitation. If you use this data in a product, compliance is your responsibility, and the endpoint can change or disappear at any time.
 
 ## License
 
