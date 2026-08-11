@@ -89,6 +89,8 @@ https://production.dataviz.cnn.io/index/fearandgreed/graphdata
 
 The endpoint rejects requests that do not look like they come from a browser, so the package sends browser-like `User-Agent` and `Referer` headers. This is the same data source used by the known wrappers in other languages.
 
+A scheduled CI job runs the test suite against the real endpoint once a week, so a change on CNN's side is detected within days.
+
 ## Migrating from v1
 
 v2 is a full rewrite: CNN removed the HTML page that v1 parsed, so v1 stopped working and its data model no longer matches what CNN publishes. Update the import path first:
