@@ -59,13 +59,13 @@ type toolResult struct {
 
 var toolDef = map[string]any{
 	"name":        toolName,
-	"description": "CNN's Fear & Greed index for the US stock market: current score (0-100) and rating, values for the previous close, week, month and year, and optionally about a year of daily history.",
+	"description": "CNN's Fear & Greed index for the US stock market: current score (0-100) and rating, values for the previous close, week, month and year, and the seven component indicators (market momentum, stock price strength and breadth, put/call options, volatility, junk bond and safe haven demand), each with its own score and rating.",
 	"inputSchema": map[string]any{
 		"type": "object",
 		"properties": map[string]any{
 			"include_history": map[string]any{
 				"type":        "boolean",
-				"description": "Include about a year of daily scores. Off by default to keep the response small.",
+				"description": "Include about a year of daily values for the index and each indicator. Off by default to keep the response small.",
 			},
 		},
 		"additionalProperties": false,
@@ -153,6 +153,13 @@ func callTool(params json.RawMessage, fetch func(context.Context) (cnnfag.Result
 	}
 	if !p.Arguments.IncludeHistory {
 		res.History = nil
+		for _, ind := range []*cnnfag.Indicator{
+			&res.MarketMomentum, &res.StockPriceStrength, &res.StockPriceBreadth,
+			&res.PutCallOptions, &res.MarketVolatility, &res.JunkBondDemand,
+			&res.SafeHavenDemand,
+		} {
+			ind.History = nil
+		}
 	}
 
 	text, err := json.MarshalIndent(res, "", "  ")

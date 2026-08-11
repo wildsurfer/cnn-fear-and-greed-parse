@@ -19,6 +19,11 @@ func TestServeMCP(t *testing.T) {
 			History: []cnnfag.Point{
 				{Date: time.Date(2025, 8, 11, 0, 0, 0, 0, time.UTC), Score: 60.2, Rating: "greed"},
 			},
+			MarketVolatility: cnnfag.Indicator{
+				Score:   50,
+				Rating:  "neutral",
+				History: []cnnfag.Value{{Date: time.Date(2025, 8, 11, 0, 0, 0, 0, time.UTC), Value: 17.5, Rating: "neutral"}},
+			},
 		}, nil
 	}
 
@@ -67,15 +72,20 @@ func TestServeMCP(t *testing.T) {
 		t.Errorf("tools/list response: %s", lines[1])
 	}
 
-	// tools/call returns the score and omits history by default.
+	// tools/call returns the score and the indicators, and omits every
+	// history by default.
 	mustUnmarshal(t, lines[2], &resp)
-	if !strings.Contains(string(resp.Result), "43.71") || strings.Contains(string(resp.Result), "history") {
+	if !strings.Contains(string(resp.Result), "43.71") ||
+		!strings.Contains(string(resp.Result), "marketVolatility") ||
+		strings.Contains(string(resp.Result), "history") ||
+		strings.Contains(string(resp.Result), "17.5") {
 		t.Errorf("tools/call without history: %s", lines[2])
 	}
 
-	// include_history brings the daily points in.
+	// include_history brings the daily points in, for the index and the
+	// indicators both.
 	mustUnmarshal(t, lines[3], &resp)
-	if !strings.Contains(string(resp.Result), "60.2") {
+	if !strings.Contains(string(resp.Result), "60.2") || !strings.Contains(string(resp.Result), "17.5") {
 		t.Errorf("tools/call with history: %s", lines[3])
 	}
 

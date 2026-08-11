@@ -37,27 +37,27 @@ func TestGet(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if result.Score != 63.6857142857143 {
-		t.Errorf("Score = %v, want 63.6857142857143", result.Score)
+	if result.Score != 64.3714285714286 {
+		t.Errorf("Score = %v, want 64.3714285714286", result.Score)
 	}
 	if result.Rating != "greed" {
 		t.Errorf("Rating = %q, want %q", result.Rating, "greed")
 	}
-	wantTS := time.Date(2026, 8, 10, 11, 53, 1, 0, time.UTC)
+	wantTS := time.Date(2026, 8, 11, 0, 0, 0, 0, time.UTC)
 	if !result.Timestamp.Equal(wantTS) {
 		t.Errorf("Timestamp = %v, want %v", result.Timestamp, wantTS)
 	}
-	if result.PreviousClose != 63.6857142857143 {
-		t.Errorf("PreviousClose = %v, want 63.6857142857143", result.PreviousClose)
+	if result.PreviousClose != 64.3714285714286 {
+		t.Errorf("PreviousClose = %v, want 64.3714285714286", result.PreviousClose)
 	}
-	if result.OneWeekAgo != 50.7428571428571 {
-		t.Errorf("OneWeekAgo = %v, want 50.7428571428571", result.OneWeekAgo)
+	if result.OneWeekAgo != 59.9714285714286 {
+		t.Errorf("OneWeekAgo = %v, want 59.9714285714286", result.OneWeekAgo)
 	}
 	if result.OneMonthAgo != 46.82857142857143 {
 		t.Errorf("OneMonthAgo = %v, want 46.82857142857143", result.OneMonthAgo)
 	}
-	if result.OneYearAgo != 58.37142857142857 {
-		t.Errorf("OneYearAgo = %v, want 58.37142857142857", result.OneYearAgo)
+	if result.OneYearAgo != 57.628571428571426 {
+		t.Errorf("OneYearAgo = %v, want 57.628571428571426", result.OneYearAgo)
 	}
 	if len(result.History) != 3 {
 		t.Fatalf("len(History) = %d, want 3", len(result.History))
@@ -72,6 +72,32 @@ func TestGet(t *testing.T) {
 	}
 	if first.Rating != "greed" {
 		t.Errorf("History[0].Rating = %q, want %q", first.Rating, "greed")
+	}
+
+	jb := result.JunkBondDemand
+	if jb.Score != 98.6 {
+		t.Errorf("JunkBondDemand.Score = %v, want 98.6", jb.Score)
+	}
+	if jb.Rating != "extreme greed" {
+		t.Errorf("JunkBondDemand.Rating = %q, want %q", jb.Rating, "extreme greed")
+	}
+	wantJBTS := time.Date(2026, 8, 11, 0, 0, 0, 0, time.UTC)
+	if !jb.Timestamp.Equal(wantJBTS) {
+		t.Errorf("JunkBondDemand.Timestamp = %v, want %v", jb.Timestamp, wantJBTS)
+	}
+	if len(jb.History) != 3 {
+		t.Fatalf("len(JunkBondDemand.History) = %d, want 3", len(jb.History))
+	}
+	if jb.History[0].Value != 1.3148745353159097 {
+		t.Errorf("JunkBondDemand.History[0].Value = %v, want 1.3148745353159097", jb.History[0].Value)
+	}
+	if jb.History[0].Rating != "extreme fear" {
+		t.Errorf("JunkBondDemand.History[0].Rating = %q, want %q", jb.History[0].Rating, "extreme fear")
+	}
+
+	// Indicator histories carry raw values, momentum's is the S&P level.
+	if result.MarketMomentum.History[0].Value != 6373.45 {
+		t.Errorf("MarketMomentum.History[0].Value = %v, want 6373.45", result.MarketMomentum.History[0].Value)
 	}
 }
 
@@ -124,5 +150,11 @@ func TestGetLive(t *testing.T) {
 	}
 	if len(result.History) == 0 {
 		t.Error("History is empty")
+	}
+	if result.MarketVolatility.Score <= 0 || result.MarketVolatility.Score > 100 {
+		t.Errorf("MarketVolatility.Score = %v, want in (0, 100]", result.MarketVolatility.Score)
+	}
+	if len(result.MarketVolatility.History) == 0 {
+		t.Error("MarketVolatility.History is empty")
 	}
 }

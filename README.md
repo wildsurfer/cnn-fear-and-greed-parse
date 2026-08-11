@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/wildsurfer/cnn-fear-and-greed-parse/v2.svg)](https://pkg.go.dev/github.com/wildsurfer/cnn-fear-and-greed-parse/v2) ![CI](https://github.com/wildsurfer/cnn-fear-and-greed-parse/actions/workflows/go.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Go package for CNN's [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed), a 0–100 gauge of US stock market sentiment. It returns the current score and rating, the values for the previous close, week, month and year, and about a year of daily history. The module also ships a CLI and an MCP server, and has no dependencies outside the Go standard library.
+Go package for CNN's [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed), a 0–100 gauge of US stock market sentiment. It returns the current score and rating, the values for the previous close, week, month and year, about a year of daily history, and the seven component indicators (market momentum, stock price strength, stock price breadth, put/call options, market volatility, junk bond demand, safe haven demand), each with its own score, rating and history of raw values. The module also ships a CLI and an MCP server, and has no dependencies outside the Go standard library.
 
 ## Install
 
@@ -32,6 +32,8 @@ func main() {
 	fmt.Printf("One year ago: %.0f\n", result.OneYearAgo)
 	fmt.Printf("History: %d daily points since %s\n",
 		len(result.History), result.History[0].Date.Format("2006-01-02"))
+	fmt.Printf("VIX indicator: %.0f (%s)\n",
+		result.MarketVolatility.Score, result.MarketVolatility.Rating)
 }
 ```
 
@@ -41,7 +43,10 @@ Output:
 Now: 64 (greed)
 One year ago: 58
 History: 250 daily points since 2025-08-11
+VIX indicator: 50 (neutral)
 ```
+
+An `Indicator`'s `History` holds the raw underlying series (the S&P 500 level for momentum, the VIX level for volatility, ratios and spreads for the rest), and its `Score` is CNN's 0–100 normalization. To use your own `http.Client` (timeout, proxy), replace `cnnfag.HTTPClient`.
 
 ## CLI
 
