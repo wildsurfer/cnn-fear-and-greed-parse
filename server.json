@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.wildsurfer/cnnfag",
+  "title": "CNN Fear & Greed Index",
+  "description": "CNN's Fear & Greed index for the US stock market: score, rating, seven component indicators and a year of daily history.",
+  "version": "2.2.0",
+  "repository": {
+    "url": "https://github.com/wildsurfer/cnn-fear-and-greed-parse",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/wildsurfer/cnnfag:2.2.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

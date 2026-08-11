@@ -84,6 +84,8 @@ $ cnnfag -json | jq .score
 
 The client must be able to find the binary: use the full path (usually `~/go/bin/cnnfag`) if your MCP client does not inherit your shell's `PATH`. Like the rest of the module, the server is built on the standard library only.
 
+The server is also published to the [MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.wildsurfer/cnnfag`, with a container image at `ghcr.io/wildsurfer/cnnfag` for clients that prefer Docker over a local binary.
+
 ## How it works
 
 CNN does not offer a documented public API. This package requests the JSON endpoint that the Fear & Greed page itself uses:
